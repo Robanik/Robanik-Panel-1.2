@@ -1,0 +1,552 @@
+
+-- Создаем ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomPanel"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Создаем главную панель
+local mainPanel = Instance.new("Frame")
+mainPanel.Size = UDim2.new(1, 0, 1, 0)
+mainPanel.Position = UDim2.new(0, 0, 0, 0)
+mainPanel.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+mainPanel.BackgroundTransparency = 0.5
+mainPanel.Parent = screenGui
+
+-- Добавляем закругленные углы к главной панели
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = mainPanel
+
+-- Создаем кнопку Open/Close
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -50, 0, 10)
+toggleButton.Text = "Open"
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextSize = 24
+toggleButton.Parent = mainPanel
+
+-- Добавляем закругленные углы к кнопке Open/Close
+local toggleButtonCorner = Instance.new("UICorner")
+toggleButtonCorner.CornerRadius = UDim.new(0, 12)
+toggleButtonCorner.Parent = toggleButton
+
+-- Создаем текст "Robanik panel 1.2" с переливающимися цветами
+local colorText = Instance.new("TextLabel")
+colorText.Size = UDim2.new(0, 200, 0, 50)
+colorText.Position = UDim2.new(0.5, -100, 0, 70)
+colorText.Text = "Robanik panel 1.2"
+colorText.BackgroundTransparency = 1
+colorText.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorText.Font = Enum.Font.SourceSansBold
+colorText.TextSize = 24
+colorText.Parent = mainPanel
+
+-- Функция для плавного изменения цвета текста
+local function animateTextColor(label)
+    while true do
+        for i = 0, 1, 0.01 do
+            label.TextColor3 = Color3.fromHSV(i, 1, 1)
+            wait(0.05)
+        end
+    end
+end
+
+-- Запуск анимации цвета текста
+spawn(function()
+    animateTextColor(colorText)
+end)
+
+-- Создаем меню
+local menuFrame = Instance.new("Frame")
+menuFrame.Size = UDim2.new(1, 0, 0.9, -60)
+menuFrame.Position = UDim2.new(0, 0, 0.1, 60)
+menuFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+menuFrame.BackgroundTransparency = 0.7
+menuFrame.Visible = false
+menuFrame.Parent = mainPanel
+
+-- Добавляем закругленные углы к меню
+local menuFrameCorner = Instance.new("UICorner")
+menuFrameCorner.CornerRadius = UDim.new(0, 12)
+menuFrameCorner.Parent = menuFrame
+
+-- Создаем вкладки
+local function createTabButton(name, position)
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(0.33, -10, 0, 50)
+    tabButton.Position = position
+    tabButton.Text = name
+    tabButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.Font = Enum.Font.SourceSansBold
+    tabButton.TextSize = 18
+    tabButton.Parent = mainPanel
+
+    -- Добавляем закругленные углы к кнопке вкладки
+    local tabButtonCorner = Instance.new("UICorner")
+    tabButtonCorner.CornerRadius = UDim.new(0, 12)
+    tabButtonCorner.Parent = tabButton
+
+    return tabButton
+end
+
+local tabHack = createTabButton("<hack>", UDim2.new(0, 10, 1, -60))
+local tabPlayers = createTabButton("<player-players>", UDim2.new(0.33, 10, 1, -60))
+local tabPanel = createTabButton("<panel>", UDim2.new(0.66, 10, 1, -60))
+
+-- Функция для изменения скорости ходьбы
+local function setWalkSpeed(speed)
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.WalkSpeed = speed
+end
+
+-- Функция для изменения силы прыжка
+local function setJumpPower(power)
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.JumpPower = power
+end
+
+-- Функция для телепортации по клику
+local function enableTPClick()
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+    
+    mouse.Button1Down:Connect(function()
+        if not menuVisible then
+            local targetPos = mouse.Hit.p
+            player.Character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+        end
+    end)
+end
+
+-- Функция для бессмертия
+local function enableGodMode()
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.MaxHealth = math.huge
+    player.Character.Humanoid.Health = math.huge
+end
+
+-- Функция для Wallhack
+local function enableWallhack()
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Transparency = 0.75
+        end
+    end
+end
+
+-- Функция для ESP
+local function enableESP()
+    local function createESP(player)
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP"
+        billboard.Adornee = player.Character.Head
+        billboard.Size = UDim2.new(1, 0, 1, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = player.Character.Head
+        
+        local frame = Instance.new("Frame", billboard)
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        frame.BackgroundTransparency = 0.5
+    end
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            createESP(player)
+        end
+    end
+    
+    game.Players.PlayerAdded:Connect(createESP)
+end
+
+-- Создаем элементы вкладки <hack>
+local function createHackElements()
+    menuFrame:ClearAllChildren()
+
+    local walkSpeedTextBox = Instance.new("TextBox")
+    walkSpeedTextBox.Size = UDim2.new(0.5, 0, 0, 50)
+    walkSpeedTextBox.Position = UDim2.new(0.25, 0, 0, 10)
+    walkSpeedTextBox.PlaceholderText = "WalkSpeed"
+    walkSpeedTextBox.Parent = menuFrame
+    walkSpeedTextBox.FocusLost:Connect(function()
+        local speed = tonumber(walkSpeedTextBox.Text)
+        if speed then
+            setWalkSpeed(speed)
+        end
+    end)
+
+    local jumpPowerTextBox = Instance.new("TextBox")
+    jumpPowerTextBox.Size = UDim2.new(0.5, 0, 0, 50)
+    jumpPowerTextBox.Position = UDim2.new(0.25, 0, 0, 70)
+    jumpPowerTextBox.PlaceholderText = "JumpPower"
+    jumpPowerTextBox.Parent = menuFrame
+    jumpPowerTextBox.FocusLost:Connect(function()
+        local power = tonumber(jumpPowerTextBox.Text)
+        if power then
+            setJumpPower(power)
+        end
+    end)
+
+    local tpClickButton = Instance.new("TextButton")
+    tpClickButton.Size = UDim2.new(0.5, 0, 0, 50)
+    tpClickButton.Position = UDim2.new(0.25, 0, 0, 130)
+    tpClickButton.Text = "TPClick"
+    tpClickButton.Parent = menuFrame
+    tpClickButton.MouseButton1Click:Connect(enableTPClick)
+
+    local godModeButton = Instance.new("TextButton")
+    godModeButton.Size = UDim2.new(0.5, 0, 0, 50)
+    godModeButton.Position = UDim2.new(0.25, 0, 0, 190)
+    godModeButton.Text = "God Mode"
+    godModeButton.Parent = menuFrame
+    godModeButton.MouseButton1Click:Connect(enableGodMode)
+
+    -- Продолжение создания элементов вкладки <hack>
+
+    local wallhackButton = Instance.new("TextButton")
+    wallhackButton.Size = UDim2.new(0.5, 0, 0, 50)
+    wallhackButton.Position = UDim2.new(0.25, 0, 0, 250)
+    wallhackButton.Text = "Wallhack"
+    wallhackButton.Parent = menuFrame
+    wallhackButton.MouseButton1Click:Connect(enableWallhack)
+
+    local espButton = Instance.new("TextButton")
+    espButton.Size = UDim2.new(0.5, 0, 0, 50)
+    espButton.Position = UDim2.new(0.25, 0, 0, 310)
+    espButton.Text = "ESP"
+    espButton.Parent = menuFrame
+    espButton.MouseButton1Click:Connect(enableESP)
+
+    local espColorTextBox = Instance.new("TextBox")
+    espColorTextBox.Size = UDim2.new(0.5, 0, 0, 50)
+    espColorTextBox.Position = UDim2.new(0.25, 0, 0, 370)
+    espColorTextBox.PlaceholderText = "ESP Color"
+    espColorTextBox.Parent = menuFrame
+    espColorTextBox.FocusLost:Connect(function()
+        local color = espColorTextBox.Text
+        -- Implement ESP color change logic here
+    end)
+
+    local ultraFlyButton = Instance.new("TextButton")
+    ultraFlyButton.Size = UDim2.new(0.5, 0, 0, 50)
+    ultraFlyButton.Position = UDim2.new(0.25, 0, 0, 430)
+    ultraFlyButton.Text = "Ultra Fly"
+    ultraFlyButton.Parent = menuFrame
+    ultraFlyButton.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        local humanoid = player.Character:WaitForChild("Humanoid")
+        
+        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        humanoid.PlatformStand = true
+        
+        local jumping = false
+        
+        player:GetMouse().KeyDown:Connect(function(key)
+            if key == "space" then
+                jumping = true
+            end
+        end)
+        
+        player:GetMouse().KeyUp:Connect(function(key)
+            if key == "space" then
+                jumping = false
+            end
+        end)
+        
+        game:GetService("RunService").Stepped:Connect(function()
+            if jumping and humanoid.FloorMaterial == Enum.Material.Water and humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                humanoid:Move(Vector3.new(0, 50, 0))
+            end
+        end)
+    end)
+
+    -- Добавляем закругленные углы к элементам вкладки <hack>
+    for _, element in pairs(menuFrame:GetChildren()) do
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 12)
+        uiCorner.Parent = element
+    end
+end
+
+-- Создаем элементы вкладки <player-players>
+local function createPlayerElements()
+    menuFrame:ClearAllChildren()
+
+    local teleportPlayersButton = Instance.new("TextButton")
+    teleportPlayersButton.Size = UDim2.new(0.5, 0, 0, 50)
+    teleportPlayersButton.Position = UDim2.new(0.25, 0, 0, 10)
+    teleportPlayersButton.Text = "Teleport Players to Me"
+    teleportPlayersButton.Parent = menuFrame
+    teleportPlayersButton.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player then
+                otherPlayer.Character:SetPrimaryPartCFrame(player.Character:GetPrimaryPartCFrame())
+            end
+        end
+    end)
+
+    local teleportToPlayerTextBox = Instance.new("TextBox")
+    teleportToPlayerTextBox.Size = UDim2.new(0.5, 0, 0, 50)
+    teleportToPlayerTextBox.Position = UDim2.new(0.25, 0, 0, 70)
+    teleportToPlayerTextBox.PlaceholderText = "Teleport to Player"
+    teleportToPlayerTextBox.Parent = menuFrame
+    teleportToPlayerTextBox.FocusLost:Connect(function()
+        local targetName = teleportToPlayerTextBox.Text
+        local targetPlayer = game.Players:FindFirstChild(targetName)
+        if targetPlayer then
+            game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(targetPlayer.Character:GetPrimaryPartCFrame())
+        end
+    end)
+
+    local deletePlayerButton = Instance.new("TextButton")
+    deletePlayerButton.Size = UDim2.new(0.5, 0, 0, 50)
+    deletePlayerButton.Position = UDim2.new(0.25, 0, 0, 130)
+    deletePlayerButton.Text = "Delete Player"
+    deletePlayerButton.Parent = menuFrame
+    deletePlayerButton.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        player.Character:Destroy()
+    end)
+
+    local deletePlayersButton = Instance.new("TextButton")
+    deletePlayersButton.Size = UDim2.new(0.5, 0, 0, 50)
+    deletePlayersButton.Position = UDim2.new(0.25, 0, 0, 190)
+    deletePlayersButton.Text = "Delete Players"
+    deletePlayersButton.Parent = menuFrame
+    deletePlayersButton.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player then
+                otherPlayer.Character:Destroy()
+            end
+        end
+    end)
+
+    local showPlayerNameButton = Instance.new("TextButton")
+    showPlayerNameButton.Size = UDim2.new(0.5, 0, 0, 50)
+    showPlayerNameButton.Position = UDim2.new(0.25, 0, 0, 250)
+    showPlayerNameButton.Text = "Show My Name"
+    showPlayerNameButton.Parent = menuFrame
+    showPlayerNameButton.MouseButton1Click:Connect(function()
+        local player = game.Players.LocalPlayer
+        local message = Instance.new("Message", workspace)
+        message.Text = "Your username is: " .. player.Name
+        wait(5)
+        message:Destroy()
+    end)
+
+    -- Добавляем закругленные углы к элементам вкладки <player-players>
+    for _, element in pairs(menuFrame:GetChildren()) do
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 12)
+        uiCorner.Parent = element
+    end
+end
+
+-- Создаем элементы вкладки <panel>
+local function createPanelElements()
+    menuFrame:ClearAllChildren()
+
+    local deletePanelButton = Instance.new("TextButton")
+    deletePanelButton.Size = UDim2.new(0.5, 0, 0, 50)
+    deletePanelButton.Position = UDim2.new(0.25, 0, 0, 10)
+    deletePanelButton.Text = "Delete Panel"
+    deletePanelButton.Parent = menuFrame
+    deletePanelButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+
+    local changeColorButton = Instance.new("TextButton")
+    changeColorButton.Size = UDim2.new(0.5, 0, 0, 50)
+    changeColorButton.Position = UDim2.new(0.25, 0, 0, 70)
+    changeColorButton.Text = "Change Color"
+    changeColorButton.Parent = menuFrame
+    changeColorButton.MouseButton1Click:Connect(function()
+        mainPanel.BackgroundColor3 = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
+    end)
+
+    local quitGameButton = Instance.new("TextButton")
+    quitGameButton.Size = UDim2.new(0.5, 0, 0, 50)
+    quitGameButton.Position = UDim2.new(0.25, 0, 0, 130)
+    quitGameButton.Text = "Quit Game"
+    quitGameButton.Parent = menuFrame
+    quitGameButton.MouseButton1Click:Connect(function()
+        game:Shutdown()
+    end)
+
+    -- Добавляем закругленные углы к элементам вкладки <panel>
+    for _, element in pairs(menuFrame:GetChildren()) do
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 12)
+        uiCorner.Parent = element
+    end
+end
+
+-- Функция переключения видимости меню
+local menuVisible = false
+toggleButton.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    menuFrame.Visible = menuVisible
+    toggleButton.Text = menuVisible and "Close" or "Open"
+end)
+
+-- Переключение вкладок
+tabHack.MouseButton1Click:Connect(function()
+    createHackElements()
+end)
+
+tabPlayers.MouseButton1Click:Connect(function()
+    createPlayerElements()
+end)
+
+tabPanel.MouseButton1Click:Connect(function()
+    createPanelElements()
+end)
+
+-- Инициализация с первой вкладки <hack>
+createHackElements()
+
+-- Функция для изменения скорости ходьбы
+local function setWalkSpeed(speed)
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.WalkSpeed = speed
+end
+
+-- Функция для изменения силы прыжка
+local function setJumpPower(power)
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.JumpPower = power
+end
+
+-- Функция для телепортации по клику
+local function enableTPClick()
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+    
+    mouse.Button1Down:Connect(function()
+        if not menuVisible then
+            local targetPos = mouse.Hit.p
+            player.Character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+        end
+    end)
+end
+
+-- Функция для бессмертия
+local function enableGodMode()
+    local player = game.Players.LocalPlayer
+    player.Character.Humanoid.MaxHealth = math.huge
+    player.Character.Humanoid.Health = math.huge
+end
+
+-- Функция для Wallhack
+local function enableWallhack()
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Transparency = 0.75
+        end
+    end
+end
+
+-- Функция для ESP
+local function enableESP()
+    local function createESP(player)
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP"
+        billboard.Adornee = player.Character.Head
+        billboard.Size = UDim2.new(1, 0, 1, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = player.Character.Head
+        
+        local frame = Instance.new("Frame", billboard)
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        frame.BackgroundTransparency = 0.5
+    end
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            createESP(player)
+        end
+    end
+    
+    game.Players.PlayerAdded:Connect(createESP)
+end
+
+-- Функция для ultra fly
+local function enableUltraFly()
+    local player = game.Players.LocalPlayer
+    local humanoid = player.Character:WaitForChild("Humanoid")
+    
+    humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+    humanoid.PlatformStand = true
+    
+    local jumping = false
+    
+    player:GetMouse().KeyDown:Connect(function(key)
+        if key == "space" then
+            jumping = true
+        end
+    end)
+    
+    player:GetMouse().KeyUp:Connect(function(key)
+        if key == "space" then
+            jumping = false
+        end
+    end)
+    
+    game:GetService("RunService").Stepped:Connect(function()
+        if jumping and humanoid.FloorMaterial == Enum.Material.Water and humanoid:GetState() == Enum.HumanoidStateType.Physics then
+            humanoid:Move(Vector3.new(0, 50, 0))
+        end
+    end)
+end
+
+-- Обработчик переключения вкладок
+local function switchTab(tabButton, callback)
+    tabButton.MouseButton1Click:Connect(function()
+        menuVisible = false
+        menuFrame.Visible = false
+        toggleButton.Text = "Open"
+        callback()
+    end)
+end
+
+-- Переключение вкладок
+switchTab(tabHack, createHackElements)
+switchTab(tabPlayers, createPlayerElements)
+switchTab(tabPanel, createPanelElements)
+
+-- Функция для плавного изменения цвета кнопок
+local function animateButtonColor(button)
+    while true do
+        for i = 0, 1, 0.01 do
+            button.BackgroundColor3 = Color3.fromHSV(i, 1, 1)
+            wait(0.05)
+        end
+    end
+end
+
+-- Запуск анимации цвета для всех кнопок
+spawn(function()
+    animateButtonColor(toggleButton)
+    animateButtonColor(tabHack)
+    animateButtonColor(tabPlayers)
+    animateButtonColor(tabPanel)
+    animateButtonColor(tpClickButton)
+    animateButtonColor(godModeButton)
+    animateButtonColor(wallhackButton)
+    animateButtonColor(espButton)
+    animateButtonColor(ultraFlyButton)
+    animateButtonColor(teleportPlayersButton)
+    animateButtonColor(deletePlayerButton)
+    animateButtonColor(deletePlayersButton)
+    animateButtonColor(showPlayerNameButton)
+    animateButtonColor(deletePanelButton)
+    animateButtonColor(changeColorButton)
+    animateButtonColor(quitGameButton)
+end)
